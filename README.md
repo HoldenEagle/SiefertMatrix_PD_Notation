@@ -85,6 +85,50 @@ def create_knot_graph(incoming_edges , outcoming_edges):
     return knot_graph
 ```
 
+Step 3: Create the Siefert Surface for the knot. For the next steps, we must have the Siefert Surface.
+For each crossing, we already have the information for the incoming and outgoing crossings, as well as the information
+on whether the edge goes under or over on a certain spot. With this information, we can each edge in a hashmap called 
+NewBounds, where it will hold the next edge in there. From there, what we can do is we can find these new isolated regions
+via cycle detection, and then store these components. A diagram of this process and the code is shown below.
+
+![image](https://github.com/user-attachments/assets/1286b009-4a8b-41a1-b8c9-9b57410eb564)
+
+```
+def get_components(incoming_edges , outcoming_edges):
+    newBounds = {}
+    for crossing in range(num_crossings):
+        incoming_under = incoming_edges[crossing][0]
+        incoming_over = incoming_edges[crossing][1]
+        outgoing_1 = outcoming_edges[crossing][0]
+        outgoing_2 = outcoming_edges[crossing][1]
+        newBounds[incoming_under] = outgoing_2
+        newBounds[incoming_over] = outgoing_1
+
+
+    newComponents = []
+    def cycleDetection(key , surfaces):
+        if key in surfaces:
+            newComponents.append(surfaces)
+            for key in surfaces:
+                newBounds[key] = "visited"
+            return
+        else:
+            surfaces.append(key)
+            cycleDetection(newBounds[key] , surfaces)
+        
+
+    for key in newBounds:
+        surfaces = []
+        if(newBounds[key] == "visited"):
+            continue
+        surfaces.append(key)
+        cycleDetection(newBounds[key] , surfaces)
+
+    return newComponents
+```
+
+
+
 
 
 
