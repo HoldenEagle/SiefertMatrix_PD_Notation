@@ -14,7 +14,7 @@ of the PD Notation. The incoming and outgoing edges will be stored in a hashmap 
 is given below of what is going on, as well as the code for this part.
 
 ![image](https://github.com/user-attachments/assets/12289547-182a-4438-b1b5-9fdd4c1acffa)
-
+```
 def find_incoming_outgoing(pd_notation):
     max_value = max(max(row) for row in pd_notation)
     incoming_edges = {}
@@ -51,6 +51,7 @@ def find_incoming_outgoing(pd_notation):
                     outcoming_edges[crossing].append(vertice[1])
                     
     return incoming_edges, outcoming_edges
+```
 
 
 
