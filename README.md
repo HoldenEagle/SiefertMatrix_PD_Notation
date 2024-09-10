@@ -53,6 +53,38 @@ def find_incoming_outgoing(pd_notation):
     return incoming_edges, outcoming_edges
 ```
 
+Second Step: Using our knowledge of the incoming and outgoing edges and each crossing, we can create 
+a graph data strcuture that will resemble the knot. This is useful in future calculations such as cycle detection,
+etc. To simplify this process, I imported the Networkx library. The rest of this code section is pretty 
+straightforward. I am using the outgoing edges and matching them with the incoming edges of another crossing. In this 
+graph, the crossings are the nodes. We are also storing the information of whether or not the edge is going over or not.
+The code in the previous section allowed us to store the edges in (under, over) fashion.
+
+![image](https://github.com/user-attachments/assets/1f404d9a-5252-4f27-949f-c81be6f1755c)
+
+```
+import networkx as nx
+def create_knot_graph(incoming_edges , outcoming_edges):
+    knot_graph = nx.MultiDiGraph()
+    knot_graph.add_nodes_from([crossing for crossing in range(num_crossings)])
+
+    for crossing in range(len(pd_notation)):
+        out_edge1 , out_edge2 = outcoming_edges[crossing]
+        for key in incoming_edges:
+            if(out_edge1 in incoming_edges[key]):
+                if(incoming_edges[key].index(out_edge1) %2 == 0):
+                    knot_graph.add_edge(crossing , key , over = False , visited = False , index = out_edge1)
+                else:
+                    knot_graph.add_edge(crossing, key , over = True , visited = False  , index = out_edge1)
+            
+            if(out_edge2 in incoming_edges[key]):
+                if(incoming_edges[key].index(out_edge2) %2 == 0):
+                    knot_graph.add_edge(crossing , key , over = False , visited = False , index = out_edge2)
+                else:
+                    knot_graph.add_edge(crossing , key , over = True , visited = False, index = out_edge2)
+    return knot_graph
+```
+
 
 
 
