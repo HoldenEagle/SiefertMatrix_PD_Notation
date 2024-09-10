@@ -15,6 +15,44 @@ is given below of what is going on, as well as the code for this part.
 
 ![image](https://github.com/user-attachments/assets/12289547-182a-4438-b1b5-9fdd4c1acffa)
 
+def find_incoming_outgoing(pd_notation):
+    max_value = max(max(row) for row in pd_notation)
+    incoming_edges = {}
+    outcoming_edges = {}
+    #add all of the nodes as keys for outcoming and incoming keys
+    for node in range(knot_graph.number_of_nodes()):
+        incoming_edges[node] = []
+        outcoming_edges[node]= []
+    for crossing in range(len(pd_notation)):
+        vertice = pd_notation[crossing]
+        incoming_edges[crossing].append(vertice[0])
+        outcoming_edges[crossing].append(vertice[2])
+        if(vertice[0] > vertice[2]):
+            if(vertice[1] > vertice[3]):
+                incoming_edges[crossing].append(vertice[3])
+                outcoming_edges[crossing].append(vertice[1])
+            else:
+                incoming_edges[crossing].append(vertice[1])
+                outcoming_edges[crossing].append(vertice[3])
+        else:
+            if(vertice[1] < vertice[3]):
+                if(vertice[3] == max_value and vertice[1] == 1):
+                    incoming_edges[crossing].append(vertice[3])
+                    outcoming_edges[crossing].append(vertice[1])
+                else:
+                    incoming_edges[crossing].append(vertice[1])
+                    outcoming_edges[crossing].append(vertice[3])
+            else:
+                if(vertice[1] == max_value and vertice[3] == 1):
+                    incoming_edges[crossing].append(vertice[1])
+                    outcoming_edges[crossing].append(vertice[3])
+                else:
+                    incoming_edges[crossing].append(vertice[3])
+                    outcoming_edges[crossing].append(vertice[1])
+                    
+    return incoming_edges, outcoming_edges
+
+
 
 
 
