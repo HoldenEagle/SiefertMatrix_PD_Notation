@@ -20,7 +20,7 @@ def find_incoming_outgoing(pd_notation):
     incoming_edges = {}
     outcoming_edges = {}
     #add all of the nodes as keys for outcoming and incoming keys
-    for node in range(knot_graph.number_of_nodes()):
+    for node in range(len(pd_notation):
         incoming_edges[node] = []
         outcoming_edges[node]= []
     for crossing in range(len(pd_notation)):
