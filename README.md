@@ -127,6 +127,39 @@ def get_components(incoming_edges , outcoming_edges):
     return newComponents
 ```
 
+Step 4: Find all the band crossings on the Siefert Surface. For each crossing in the PD notation matrix,
+we find all of the incoming and outgoing edges again. We find the two surfaces involved and then label that crossing.
+Whichever surface is over the other is the first surface mentioned in the crossing tuple. These tuples are all stored in the
+all_crossing list. We also try to figure out whether a crossing is a left or right crossing in this stage, and store an array
+of +1's and -1's to hold the oreintation of each crossing. I believe right crossings are represented with a +1.
+
+![image](https://github.com/user-attachments/assets/93b1408b-e433-4a56-a315-e33d8e9363fe)
+
+```
+def find_crossings(incoming_edges , outcoming_edges):
+    all_crossings = []
+    left_right_crossings = []
+    for crossing in range(num_crossings):
+        vertice = pd_notation[crossing]
+        incoming_under = incoming_edges[crossing][0]
+        incoming_over = incoming_edges[crossing][1]
+        outgoing_1 = outcoming_edges[crossing][0]
+        outgoing_2 = outcoming_edges[crossing][1]
+    
+        for i in range(len(newComponents)):
+            if incoming_under in newComponents[i] and   outgoing_2 in newComponents[i]:
+                underStrand = i
+            if incoming_over in newComponents[i] and   outgoing_1 in newComponents[i]:
+                overStrand = i
+        all_crossings.append((overStrand , underStrand))
+        left_right_crossings.append(1 if (incoming_over == vertice[3]) else -1)
+    return all_crossings , left_right_crossings
+```
+
+
+
+
+
 
 
 
