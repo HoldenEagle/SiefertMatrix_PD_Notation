@@ -155,6 +155,67 @@ def find_crossings(incoming_edges , outcoming_edges):
         left_right_crossings.append(1 if (incoming_over == vertice[3]) else -1)
     return all_crossings , left_right_crossings
 ```
+Step 5: Find the Surface Orientations for each surface on the knot. This is the step that will
+aid the process of creating the surface rolidex later on. The goal of this step is to find the oreintation of each surface.
+We start with a hashmap that will store the neighboring surfaces. This will allow us to find the neighbor count of each surface.
+In the next step we have to find a surface to start the traversal on. I decided to try 
+to start on a surface with only one neighbor, and if this wasn't possible, then start at the first surface in the components list.
+After this step, I reconstructed a graph of the surfaces using the crossings tuples, with each surface as a node and the edges as 
+the crossings between them. I did this using a custom built class Crossing_Graph(), which I will explain later on, but from here, I
+performed a depth first traversal to get to all of the surfaces and the oreintation of each. I started the beginning surface as 
+True, resembling that we are starting clockwise. I start from the beginning surface and branch out, and since each surface is connected in this component
+we will reach all of them. If the surface is over another and is already clockwise, the surface on the  new under side will be counterclockwise, or if the surface
+that is over is counterclockwise, the under side will be clockwise. If the under surface is clockwise, the new over surface will be clockwise, and vice versa.
+
+```
+def get_orientation(all_crossings):
+    neighbors = {}
+    for crossing in all_crossings:
+        over , under = crossing
+        if over not in neighbors:
+            neighbors[over] = [under]
+        if under not in neighbors:
+            neighbors[under] = [over]
+    
+        if over not in neighbors[under]:
+            neighbors[under].append(over)
+        if under not in neighbors[over]:
+            neighbors[over].append(under)
+
+
+    starting_node = None
+    for node in neighbors:
+        if len(neighbors[node]) < 2 and not starting_node:
+            starting_node = node
+    #Surface front/back orientation
+    surfaceGraph = Crossing_Graph()
+    surfaceGraph.create_graph_from_crossings(all_crossings)
+    #start at starting node
+    surface_orientation = {}
+    visited = [False for _ in range(len(surfaceGraph.nodes))]
+    surface_orientation[starting_node] = True
+    visited[starting_node] = True
+
+    def findOrientation(over, under , original):
+        if visited[over] and visited[under]:
+            return
+        elif visited[over]:
+            surface_orientation[under] = False if surface_orientation[over] else True
+            visited[under] = True
+        elif visited[under]:
+            surface_orientation[over] = True if surface_orientation[under] else False
+            visited[over] = True
+        nextSurf = over if over != original else under
+        for neighbor in surfaceGraph.node_edge_indices[nextSurf]:
+            crossing_ = all_crossings[neighbor]
+            findOrientation(crossing_[0] , crossing_[1] , nextSurf)
+    for neighbor in surfaceGraph.node_edge_indices[starting_node]:
+        crossing_ = all_crossings[neighbor]
+        findOrientation(crossing_[0] , crossing_[1] , starting_node)
+        
+    return surface_orientation
+```
+
 
 
 
