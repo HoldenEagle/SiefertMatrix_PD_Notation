@@ -246,6 +246,7 @@ will be returned in a matrix where each element in the list is a sublist of cros
 traverse.
 
 ```
+```
 class Crossing_Graph():
     def __init__(self):
         self.nodes = []
@@ -256,7 +257,7 @@ class Crossing_Graph():
         self.loops =[]
         self.all_crossings = None
 ```
-```        
+        
     
     def add_node(self, value):
         if value not in self.nodes:
