@@ -424,8 +424,9 @@ crossings in the loop, and the over under calculation just involves starting on 
 crossings it involves and checking for the new suface. If its the first element of the crossing, the loop is going over on
 this crossing.
 
-Function to calculate the Over_Under crossings for each loop:
+
 ```
+#Function to calculate the Over_Under crossings for each loop:
 def find_over_unders(loops_we_have , all_crossings):
     over_unders = []
     #get the over/ under information , over = True, under = False
