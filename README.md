@@ -446,6 +446,24 @@ def find_over_unders(loops_we_have , all_crossings):
     return over_unders
 ```
 ```
+def find_previous_crossings(loops_we_have):
+    prev_crossing = []
+    for loop in loops_we_have:
+        prev = []
+        prev.append(loop[-1])
+        for crossing_index in range(1 , len(loop)):
+            prev.append(loop[crossing_index-1])
+        
+        prev_crossing.append(prev) 
+    return prev_crossing
+```
+```
+
+
+
+
+
+
 
 
 
