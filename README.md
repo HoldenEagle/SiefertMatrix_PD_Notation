@@ -244,7 +244,7 @@ as the create graph function and the detect cycle function. This code displays t
 Crossing Graph, which includes the linear independent loops function (find_linear_independent_loops). The loops
 will be returned in a matrix where each element in the list is a sublist of crossings that the loop will
 traverse.
-```
+
 ```
 class Crossing_Graph():
     def __init__(self):
@@ -255,6 +255,7 @@ class Crossing_Graph():
         self.visited_surfaces = None
         self.loops =[]
         self.all_crossings = None
+```
 ```        
     
     def add_node(self, value):
@@ -425,7 +426,7 @@ crossings it involves and checking for the new suface. If its the first element 
 this crossing.
 
 
-```
+
 ```
 def find_over_unders(loops_we_have , all_crossings):
     over_unders = []
@@ -457,7 +458,7 @@ def find_previous_crossings(loops_we_have):
         prev_crossing.append(prev) 
     return prev_crossing
 ```
-```
+
 
 
 
