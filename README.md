@@ -459,6 +459,15 @@ def find_previous_crossings(loops_we_have):
         prev_crossing.append(prev) 
     return prev_crossing
 ```
+Now that we have all of the information we need, it is time to create the Siefert Matrix. I created my own custom class called Matrix_test where
+I put multiple helper functions for add entries into the Siefert Matrix, along with the function to compute the Matrix. Some of these helper function
+include computing the similar surfaces that two loops travel on. I originally intialize the matrix class with these two lines, and it creates a 
+Numpy Array of all zeroes to the dimensions of the loops we have. Then we can begin to add entries to the matrix
+```
+SM = Matrix_test(loops_we_have , left_right_crossings , surface_rolidex , over_unders , prev_crossing , all_crossings , surface_orientation)
+SM.add_entries()
+```
+
 
 
 
