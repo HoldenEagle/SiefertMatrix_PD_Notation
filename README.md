@@ -243,6 +243,7 @@ cannot be in the vector span. Below is the code for the linear independent loop 
 as the create graph function and the detect cycle function. This code displays the entire class for the
 Crossing Graph, which includes the linear independent loops function
 ```
+```
 class Crossing_Graph():
     def __init__(self):
         self.nodes = []
@@ -252,7 +253,7 @@ class Crossing_Graph():
         self.visited_surfaces = None
         self.loops =[]
         self.all_crossings = None
-        
+```        
     
     def add_node(self, value):
         if value not in self.nodes:
