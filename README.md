@@ -426,7 +426,6 @@ this crossing.
 
 
 ```
-#Function to calculate the Over_Under crossings for each loop:
 def find_over_unders(loops_we_have , all_crossings):
     over_unders = []
     #get the over/ under information , over = True, under = False
@@ -445,7 +444,6 @@ def find_over_unders(loops_we_have , all_crossings):
         over_unders.append(ov_und)
     return over_unders
 
-#Function to calculate the Previous crossings for each loop:
 
 def find_previous_crossings(loops_we_have):
     prev_crossing = []
