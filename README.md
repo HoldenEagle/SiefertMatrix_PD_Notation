@@ -257,7 +257,7 @@ class Crossing_Graph():
         self.loops =[]
         self.all_crossings = None
 ```
-        
+```    
     
     def add_node(self, value):
         if value not in self.nodes:
