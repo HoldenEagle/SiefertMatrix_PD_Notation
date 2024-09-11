@@ -235,13 +235,15 @@ for components_index in range(len(newComponents)):
     surface_rolidex.append(crossing_positions)
 ```
 ```
-For the next step: We must find the linearly independent loops that make up the homology group
-of the knot. To do this, we use the functions in my custom class, Crossing Graph, that I created
+For the next step we must find the linearly independent loops that make up the homology group
+of the knot. To do this, we use the functions in my custom class that I created, Crossing Graph,
 such as the create graph given the crossings and a helper function that can detect cycles in a graph.
 For this section I represent each crossing as a linear independent vector, and each loop we create
-cannot be in the vector span. Below is the code for the linear independent loop function, as well
+cannot be in the existing vector span. Below is the code for the linear independent loop function, as well
 as the create graph function and the detect cycle function. This code displays the entire class for the
-Crossing Graph, which includes the linear independent loops function
+Crossing Graph, which includes the linear independent loops function (find_linear_independent_loops). The loops
+will be returned in a matrix where each element in the list is a sublist of crossings that the loop will
+traverse.
 ```
 ```
 class Crossing_Graph():
@@ -411,6 +413,51 @@ class Crossing_Graph():
 
         return loops_we_have
 ```
+After this step, we only need to calculate two more lists before starting to create the matrix. I decided to calculate
+when each loop goes over and under at each crossing they traverse, as well as the previous crossing for each position on
+the linearly independent loops. The goal of this is to make the calculations for the matrix entries easier by knowing whether
+the loop is going under or over at each crossing, and if we have that information for both loops in the intersection, then it
+becomes easy to calculate the value to be placed in the Siefert Matrix. The previous crossing matrix will allow us to detect
+the invisible crossings more efficiently. Knowing where the loop is exactly moving on the surface will make it easier to
+detect such crossings. Both of these calculations are simple, the previous crossings is stored as a cycle of the previous
+crossings in the loop, and the over under calculation just involves starting on an over crossing, and then going through the
+crossings it involves and checking for the new suface. If its the first element of the crossing, the loop is going over on
+this crossing.
+
+Function to calculate the Over_Under crossings for each loop:
+```
+def find_over_unders(loops_we_have , all_crossings):
+    over_unders = []
+    #get the over/ under information , over = True, under = False
+    for loop in loops_we_have:
+        prev_surf = all_crossings[loop[0]][1]
+        ov_und = []
+        ov_und.append(True)
+        for crossing_index in range(1 , len(loop)):
+            crossing = loop[crossing_index]
+            if all_crossings[crossing][0] == prev_surf:
+                ov_und.append(True)
+            else:
+                ov_und.append(False)
+            prev_surf = all_crossings[crossing][1]
+            
+        over_unders.append(ov_und)
+    return over_unders
+```
+Function to calculate the Previous crossings for each loop:
+```
+def find_previous_crossings(loops_we_have):
+    prev_crossing = []
+    for loop in loops_we_have:
+        prev = []
+        prev.append(loop[-1])
+        for crossing_index in range(1 , len(loop)):
+            prev.append(loop[crossing_index-1])
+        
+        prev_crossing.append(prev) 
+    return prev_crossing
+```
+
 
 
 
