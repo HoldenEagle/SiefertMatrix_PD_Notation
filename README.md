@@ -750,7 +750,20 @@ class Matrix_test():
                       
         print(self.matrix)
 ```
+Final Step: Computing the knot invarient Determinant from the Siefert Matrix. This is a very simple step, and this
+function is built into the custom siefert matrix class I built for the previous step. This determinent 
+function involves finding the transpose, finding the determinent of the subtraction of the two matrices, 
+and returning the absolute value.
 
+```
+def compute_determinant_invarient(self):
+        matrix_T = np.transpose(self.matrix)
+        neg_mat = matrix_T * -1
+        
+        resulting_mat = self.matrix - neg_mat
+        det1 = det(resulting_mat)
+        return np.abs(round(det1))
+```
 
 
 
