@@ -188,6 +188,8 @@ def get_orientation(all_crossings):
     for node in neighbors:
         if len(neighbors[node]) < 2 and not starting_node:
             starting_node = node
+    if not starting_node:
+        starting_node = 0
     #Surface front/back orientation
     surfaceGraph = Crossing_Graph()
     surfaceGraph.create_graph_from_crossings(all_crossings)
