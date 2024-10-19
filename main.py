@@ -7,13 +7,16 @@ from testingLoopCreation import Crossing_Graph
 from matrixTest import Siefert_Matrix
 
 #start off with the pd_notation and find the max value of this matrix. Needed to create the graph of the knot
-pd_notation = [[3,1,4,6] , [1,5,2,4] , [5,3,6,2]]
+pd_notation = [[1,11,2,10],[3,15,4,14],[5,13,6,12],[7,17,8,16],[9,1,10,18],[11,3,12,2],[13,5,14,4],[15,7,16,6],[17,9,18,8]]
 max_value = max(max(row) for row in pd_notation)
 
 #import graph class to make creating the graph easier
    
 import numpy as np
 import sympy
+import networkx as nx
+import matplotlib.pyplot as plt
+from matplotlib.path import Path
 
 
 #calculate number of nodes in the graph. (This will be the number of crossings) , equal to the rows in the pd_not
@@ -61,8 +64,8 @@ def find_incoming_outgoing(pd_notation):
     return incoming_edges, outcoming_edges
 
 incoming_edges , outcoming_edges = find_incoming_outgoing(pd_notation)
-print(f"incoming_edges : {incoming_edges}")
-print(f"outcoming_edges : {outcoming_edges}")
+#print(f"incoming_edges : {incoming_edges}")
+#print(f"outcoming_edges : {outcoming_edges}")
 
 '''
 For each crossing in our knot diagram, we can use the 
@@ -91,8 +94,9 @@ def create_knot_graph(incoming_edges , outcoming_edges):
                     knot_graph.add_edge(crossing , key , over = True , visited = False, index = out_edge2)
     return knot_graph
 knot_graph = create_knot_graph(incoming_edges , outcoming_edges)                
-#for u , v in knot_graph.edges():
-    #print(u , v, knot_graph.get_edge_data(u ,v))
+k_e = [(u,v) for u,v in knot_graph.edges()]
+print(k_e)
+print("all good before here--------------")
 
 '''  
 In this section, we can determine at each crossing the position of each edge that goes into the crossing
@@ -133,9 +137,27 @@ def get_components(incoming_edges , outcoming_edges):
     return newComponents
 
 newComponents = get_components(incoming_edges , outcoming_edges)
+print(newComponents)
+print("all good before here--------------")
+#SECTION TO GET IT READY FOR SURFACE ORIENTATION
+edge_versions = []
+for comp in newComponents:
+    ev = []
+    for ind in comp:
+        ev += (list((u, v) for u, v, data in knot_graph.edges(data=True) if data.get('index') == ind))
+    edge_versions.append(ev)
+print(f"Edge_versions: {edge_versions}")
 
-#Crossings
-
+finalized_versions = []
+for edg in edge_versions:
+    new_cycle = []
+    new_cycle += [edg[0][0] , edg[0][1]]
+    for i in range(1, len(edg)):
+        new_cycle.append(edg[i][1])
+    finalized_versions.append(new_cycle)
+print(f"Finalized versions: {finalized_versions}")    
+print(f"k_e {k_e}")
+#WHAT WE SEND IN, FINALIZED_VERSIONS and k_e
 '''
 Now its time to calculate the crossings. Loop through the crossings in the pd_notation,
 and get the original crossing of it. Get the incoming and outcoming crossings and also
@@ -169,7 +191,45 @@ print(left_right_crossings)
 
 #finding the neighboring surface function. Used later to help find the orientation of the 
 #surfaces
-def get_orientation(all_crossings):
+def find_orientations(Finalized_versions, k_e , all_crossings):
+    knot = nx.DiGraph()
+    knot.add_edges_from(k_e)
+    orig_pos = nx.planar_layout(knot)
+    #nx.draw(knot , orig_pos, with_labels=True, node_color='lightblue', node_size=500, font_size=10, arrows=True)
+    #plt.show()
+
+    
+    actual_points = [orig_pos[u].tolist() for u in orig_pos]
+
+    points_version_of_fv = []
+
+    for fv in Finalized_versions:
+        newList = []
+        for surf in fv:
+            newList.append(tuple(actual_points[surf]))
+        points_version_of_fv.append(newList)
+    
+    #print(points_version_of_fv)
+
+
+    def find_point(surface):
+        big_x = sum([i[0] for i in surface])
+        big_y = sum([i[1] for i in surface])
+        return [big_x / len(surface) , big_y / len(surface)]
+
+
+    isupperON = [None for i in Finalized_versions]
+    for i , fv in enumerate(Finalized_versions):
+        for j , sv in enumerate(Finalized_versions):
+            s = list(set(fv) - set(sv))
+            if(len(s) == 0 and fv != sv):
+                average_point = find_point(points_version_of_fv[i])
+                polygon_path = Path(points_version_of_fv[j])
+                is_inside = polygon_path.contains_point(average_point)
+                if is_inside:
+                    isupperON[i] = j
+    print(isupperON)
+
     neighbors = {}
     for crossing in all_crossings:
         over , under = crossing
@@ -183,42 +243,49 @@ def get_orientation(all_crossings):
         if under not in neighbors[over]:
             neighbors[over].append(under)
 
-
     starting_node = None
     for node in neighbors:
         if len(neighbors[node]) < 2 and not starting_node:
             starting_node = node
     if not starting_node:
         starting_node = 0
-    #Surface front/back orientation
-    surfaceGraph = Crossing_Graph()
-    surfaceGraph.create_graph_from_crossings(all_crossings)
-    #start at starting node
-    surface_orientation = {}
-    visited = [False for _ in range(len(surfaceGraph.nodes))]
-    surface_orientation[starting_node] = True
-    visited[starting_node] = True
 
-    def findOrientation(over, under , original):
-        if visited[over] and visited[under]:
-            return
-        elif visited[over]:
-            surface_orientation[under] = False if surface_orientation[over] else True
-            visited[under] = True
-        elif visited[under]:
-            surface_orientation[over] = True if surface_orientation[under] else False
-            visited[over] = True
-        nextSurf = over if over != original else under
-        for neighbor in surfaceGraph.node_edge_indices[nextSurf]:
-            crossing_ = all_crossings[neighbor]
-            findOrientation(crossing_[0] , crossing_[1] , nextSurf)
-    for neighbor in surfaceGraph.node_edge_indices[starting_node]:
-        crossing_ = all_crossings[neighbor]
-        findOrientation(crossing_[0] , crossing_[1] , starting_node)
+    print(neighbors , starting_node)
+    print(k_e)
+    clockwise = True
+    visited = [False for i in range(len(Finalized_versions))]
+    orientation = [False for i in range(len(Finalized_versions))]
+
+    def find_orientations(surface , clockwise):
+        orientation[surface] = clockwise
+        visited[surface] = True
+    
+        surf_neighbors = neighbors[surface]
+        for surf in surf_neighbors:
+            if not visited[surf]:
+                if isupperON[surf] == surface or isupperON[surface] == surf:
+                    find_orientations(surf , not clockwise)
+                else:
+                    find_orientations(surf , clockwise)
+    
+    find_orientations(starting_node , clockwise)
+    
+    
+    surface_rolidex = []
+    for i , surface in enumerate(Finalized_versions):
+        s = surface
+        s.pop()
+        if not orientation[i]:
+            surface_rolidex.append(s[::-1])
+        else:
+            surface_rolidex.append(s)
         
-    return surface_orientation
+    
+    return orientation , surface_rolidex
+                
 
-surface_orientation = get_orientation(all_crossings)
+
+surface_orientation , surface_rolidex = find_orientations(finalized_versions , k_e , all_crossings)
  
           
 '''
@@ -226,21 +293,9 @@ Get the rolidex for each surface. This helps with the order of crossings for our
 Based on if the surface is clockwise or counterclockwise, the idea is to order the crossings
 based on their oreintation so we can find loop intersections that occur on the Siefert Surface  
 '''
-edges_with_data = knot_graph.edges(data= True)
-index = [index for index in edges_with_data if index[2]['index'] == 1]
-surface_rolidex = []
-#print(surface_orientation)
-print(all_crossings)
-for components_index in range(len(newComponents)):
-    crossing_positions = []
-    for edge in newComponents[components_index]:
-        edge_dest = [index[1] for index in edges_with_data if index[2]['index'] == edge]
-        crossing_positions.append(edge_dest[0])
-    if not surface_orientation[components_index]:
-        crossing_positions = crossing_positions[::-1]
-    surface_rolidex.append(crossing_positions)
 
-#print(all_crossings)
+
+print(all_crossings)
 print(f"surface_orientation: {surface_orientation}")
 print(f"New components: {newComponents}")
 print(f"surface_rolidex: {surface_rolidex}")
